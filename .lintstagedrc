@@ -1,0 +1,4 @@
+{
+  "*.(ts|(m|c)?js)": ["eslint", "prettier --list-different"],
+  "*.(md|json)": ["prettier --list-different"]
+}
