@@ -1,9 +1,9 @@
 import { createTicker } from 'tickloop'
+import { createStage } from 'webgl-stage'
 import type { MeshGradientOptions, Vector2 } from './types'
 import { resolveConfig } from './lib'
 import canvasVertexSource from './shaders/meshgradient.vert?raw'
 import canvasFragmentSource from './shaders/meshgradient.frag?raw'
-import { createStage } from './lib/gl/createStage'
 
 export const createMeshGradient = (canvas: HTMLCanvasElement, options: MeshGradientOptions) => {
   const result = resolveConfig(options)
@@ -93,9 +93,6 @@ export const createMeshGradient = (canvas: HTMLCanvasElement, options: MeshGradi
       ].join(', ')})`
     )
 
-  // controlPointPositions[32] = -0.3
-  // controlPointPositions[33] = -0.3
-
   const stage = createStage({
     canvas,
     attributes: {
@@ -113,7 +110,6 @@ export const createMeshGradient = (canvas: HTMLCanvasElement, options: MeshGradi
       },
       a_color: {
         type: 'float',
-        // data: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0]),
         data: new Float32Array(
           Array.from({ length: pointCount.x * pointCount.y * 3 }, () => Math.random())
         ),
@@ -145,7 +141,6 @@ export const createMeshGradient = (canvas: HTMLCanvasElement, options: MeshGradi
 
   const ticker = createTicker()
   ticker.add(() => {
-    // stage.setUniform('u_time', [time * 0.001])
     stage.render()
   })
 }
