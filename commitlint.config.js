@@ -1,3 +1,4 @@
 module.exports = {
-  extends: ['@commitlint/config-lerna-scopes'],
-};
+  extends: ['@commitlint/config-conventional'],
+  plugins: ['commitlint-plugin-workspace-scopes'],
+}

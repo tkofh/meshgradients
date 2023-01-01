@@ -1,0 +1,51 @@
+{
+  "name": "meshgradients",
+  "version": "0.0.0",
+  "description": "Mesh Gradient Tools",
+  "author": "Tim Morris <timthewebguy@gmail.com>",
+  "homepage": "https://github.com/tkofh/meshgradients#readme",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tkofh/meshgradients.git"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "playground": "vite",
+    "prepublish": "pnpm build"
+  },
+  "bugs": {
+    "url": "https://github.com/tkofh/meshgradients/issues"
+  },
+  "devDependencies": {
+    "tickloop": "^0.5.0",
+    "tsup": "^6.5.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3"
+  },
+  "gitHead": "96019bee6135f93006c3fd52d23846afd6271c66",
+  "dependencies": {
+    "defu": "^6.1.1",
+    "gl-matrix": "^3.4.3",
+    "perfect-debounce": "^0.1.3"
+  }
+}

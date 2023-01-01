@@ -1,0 +1,1 @@
+export { createMeshGradient } from './createMeshGradient'
