@@ -1,7 +1,7 @@
 {
-  "name": "@meshgradients/core",
+  "name": "@meshgradients/canvas",
   "version": "0.0.0",
-  "description": "Mesh Gradient Tools",
+  "description": "Mesh Gradient for HTML Canvas",
   "author": "Tim Morris <timthewebguy@gmail.com>",
   "homepage": "https://github.com/tkofh/meshgradients#readme",
   "license": "MIT",
@@ -29,27 +29,20 @@
   },
   "scripts": {
     "build": "unbuild",
-    "watch": "nodemon --ignore ./dist/ --exec pnpm build",
-    "test": "vitest",
+    "playground": "vite",
     "prepublish": "pnpm build"
   },
   "bugs": {
     "url": "https://github.com/tkofh/meshgradients/issues"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "tickloop": "^0.5.0",
-    "tsup": "^7.2.0",
+    "jiti": "^1.19.3",
     "typescript": "^5.1.6",
     "unbuild": "^1.2.1",
-    "vite": "^4.4.9",
-    "vitest": "^0.34.2"
+    "vite": "^4.4.9"
   },
-  "gitHead": "96019bee6135f93006c3fd52d23846afd6271c66",
   "dependencies": {
-    "@webgl-tools/glsl-nodes": "^0.7.1",
-    "defu": "^6.1.2",
-    "gl-matrix": "^3.4.3",
-    "mitt": "^3.0.1"
+    "@meshgradients/core": "workspace:^0.0.0",
+    "@webgl-tools/stage": "^0.2.1"
   }
 }

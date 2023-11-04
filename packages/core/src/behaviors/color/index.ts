@@ -1,0 +1,1 @@
+export { solidColor } from './solidColor'

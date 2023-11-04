@@ -4,7 +4,7 @@ window.addEventListener(
   'load',
   () => {
     const canvas = document.querySelector<HTMLCanvasElement>('#canvas')
-    createMeshGradient(canvas, { subdivisions: 18, points: 8 })
+    createMeshGradient({ subdivisions: 0, points: 4 }, canvas)
   },
   { capture: false }
 )

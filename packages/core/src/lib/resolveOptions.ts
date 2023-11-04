@@ -1,12 +1,14 @@
-import type { MeshGradientOptions, MeshGradientConfig } from '../types'
+import type { MeshGradientOptions, ResolvedMeshGradientOptions } from '../types'
 
 /**
  * Returns a config object based on the user's input options and the library defaults
  * @param options
  */
-export const resolveConfig = (
+export const resolveOptions = (
   options: MeshGradientOptions
-): { success: true; config: MeshGradientConfig } | { success: false; messages: string[] } => {
+):
+  | { success: true; options: ResolvedMeshGradientOptions }
+  | { success: false; messages: string[] } => {
   const messages: string[] = []
   if (typeof options.subdivisions === 'number') {
     if (options.subdivisions < 0) {
@@ -44,8 +46,7 @@ export const resolveConfig = (
     }
     return {
       success: true,
-      config: {
-        maxPixelRatio: options.maxPixelRatio ?? 2,
+      options: {
         subdivisions,
         points,
       },
