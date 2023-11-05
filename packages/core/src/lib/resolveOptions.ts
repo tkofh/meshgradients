@@ -1,4 +1,4 @@
-import type { MeshGradientOptions, ResolvedMeshGradientOptions } from '../types'
+import type { MeshGradientOptions, ResolvedMeshGradientOptions } from '../types/mesh'
 
 /**
  * Returns a config object based on the user's input options and the library defaults

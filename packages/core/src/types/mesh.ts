@@ -51,6 +51,7 @@ export type MeshGradientUniform =
 export interface MeshGradientAttribute {
   size: number
   data: Float32Array
+  usage?: 'STATIC_DRAW' | 'DYNAMIC_DRAW' | 'STREAM_DRAW'
 }
 
 export interface MeshGradientAttributes {

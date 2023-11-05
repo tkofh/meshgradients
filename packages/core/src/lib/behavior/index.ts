@@ -1,1 +1,0 @@
-export { defineBehavior } from './defineBehavior'

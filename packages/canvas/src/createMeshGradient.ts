@@ -8,29 +8,15 @@ export const createMeshGradient = (
 ) => {
   const configuration = configureMeshGradient(options)
 
-  console.log(configuration.vertexShader)
-  console.log(configuration.fragmentShader)
-
   const stage = createStage({
     canvas,
-    attributes: {
-      ...configuration.attributes,
-      // a_color: {
-      //   data: new Float32Array(
-      //     Array.from({ length: configuration.attributes.a_t.data.length * 3 }, () => Math.random())
-      //   ),
-      //   size: 3,
-      //   usage: 'STATIC_DRAW',
-      // },
-    },
+    attributes: configuration.attributes,
     elements: {
       data: configuration.triangles,
       mode: 'TRIANGLES',
       type: 'UNSIGNED_SHORT',
     },
-    uniforms: {
-      ...configuration.uniforms,
-    },
+    uniforms: configuration.uniforms,
     vertexShader: configuration.vertexShader,
     fragmentShader: configuration.fragmentShader,
     observeResize: true,
@@ -39,6 +25,10 @@ export const createMeshGradient = (
   if (stage instanceof Error) {
     throw new TypeError(`Failed to create Mesh Gradient: ${stage.message}`)
   }
+
+  console.log(stage.vertexShader)
+  console.log('')
+  console.log(stage.fragmentShader)
 
   stage.render()
 }

@@ -17,15 +17,31 @@ import {
   output,
 } from '@webgl-tools/glsl-nodes'
 import mitt from 'mitt'
+import type { BehaviorSetup, BehaviorSetupContext, BehaviorSetupEmitter } from '../types/behavior'
 import type {
-  BehaviorSetup,
-  BehaviorSetupContext,
-  BehaviorSetupEmitter,
   MeshGradientAttributes,
   MeshGradientGeometry,
   MeshGradientUniforms,
-} from '../../types'
-import { IDENTITY_MATRIX } from './constants'
+} from '../types/mesh'
+
+const IDENTITY_MATRIX = [
+  '0.0',
+  '-0.5',
+  '1.0',
+  '-0.5',
+  '1.0',
+  '0.0',
+  '-2.5',
+  '1.5',
+  '0.0',
+  '0.5',
+  '2.0',
+  '-1.5',
+  '0.0',
+  '0.0',
+  '-0.5',
+  '0.5',
+]
 
 export const compileShaders = (geometry: MeshGradientGeometry, behaviors: BehaviorSetup[]) => {
   const namer = createNamer()

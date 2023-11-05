@@ -57,8 +57,42 @@ importers:
         specifier: ~5.2.2
         version: 5.2.2
 
+  packages/behavior:
+    dependencies:
+      '@chromatika/core':
+        specifier: ^0.2.0
+        version: 0.2.0
+      '@meshgradients/core':
+        specifier: workspace:^
+        version: link:../core
+      '@webgl-tools/glsl-nodes':
+        specifier: ^0.9.0
+        version: 0.9.0
+      micro-math:
+        specifier: ^0.10.0
+        version: 0.10.0
+    devDependencies:
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.2.2)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.2.2)
+      vite:
+        specifier: ^4.5.0
+        version: 4.5.0(@types/node@18.18.8)
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6
+
   packages/canvas:
     dependencies:
+      '@meshgradients/behavior':
+        specifier: workspace:^0.0.0
+        version: link:../behavior
       '@meshgradients/core':
         specifier: workspace:^0.0.0
         version: link:../core
@@ -361,6 +395,15 @@ packages:
     resolution: {integrity: sha512-hBzuU5+JjB2cqNZyszkDHZgOSrUUT8V3dhgRl8Q9Gp6dAj/H5+KILGjbhDpc3Iy9qmqlm/akuOI2ut9VUtzJxQ==}
     dev: true
 
+  /@chromatika/core@0.2.0:
+    resolution: {integrity: sha512-wqWQ4Zh7nHu2VeWntg2xyqWKZdV6S0iIhf+ioPauhMA93Pc0F+iroPgdmh1iAdhV69VxFIBFjLbtEbR/UTi2bQ==}
+    dependencies:
+      '@curvy/catmull-rom': 0.4.1
+      '@curvy/types': 0.8.0
+      log-if-env: 0.1.0
+      micro-math: 0.10.0
+    dev: false
+
   /@commitlint/cli@18.2.0(typescript@5.2.2):
     resolution: {integrity: sha512-F/DCG791kMFmWg5eIdogakuGeg4OiI2kD430ed1a1Hh3epvrJdeIAgcGADAMIOmF+m0S1+VlIYUKG2dvQQ1Izw==}
     engines: {node: '>=v18'}
@@ -559,6 +602,25 @@ packages:
     dependencies:
       chalk: 4.1.2
     dev: true
+
+  /@curvy/catmull-rom@0.4.1:
+    resolution: {integrity: sha512-S1+ueO3JlsHsVmaeJKzkBsHjyj1xg0aky0T8K21yoA2nujZy/28rQKuZBaxRbnq4yDNjJP8b/ctclfOZ9mj5Rg==}
+    dependencies:
+      '@curvy/types': 0.8.0
+      '@curvy/uniform': 0.8.0
+    dev: false
+
+  /@curvy/types@0.8.0:
+    resolution: {integrity: sha512-d2MVTKNZIToL5mM5ar5Sa/aG6DJnGm8bUk7FXiy/wMBH19B84ik9FyUgkEwupA5OS05ScmZR3Zji6E1aA2NWpQ==}
+    dev: false
+
+  /@curvy/uniform@0.8.0:
+    resolution: {integrity: sha512-0oAoEtiwozEV2CEkYGE0cxP939TjZW2EZaiw0GrSgOEc/suq4bfSETlK/EA7W0n7ApuCgBBp/IWgYpIcouKTGg==}
+    dependencies:
+      '@curvy/types': 0.8.0
+      log-if-env: 0.1.0
+      micro-math: 0.9.0
+    dev: false
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
@@ -1754,6 +1816,12 @@ packages:
 
   /@webgl-tools/glsl-nodes@0.8.0:
     resolution: {integrity: sha512-3YpKWwH7abnRdhgS4C41TOR/ENNi48Txb1pbOACukArSye5Z5Zkr4qgQhGnfiq/xORhkOiq2OvY/L9MRDKt6Kw==}
+    dependencies:
+      scule: 1.0.0
+    dev: false
+
+  /@webgl-tools/glsl-nodes@0.9.0:
+    resolution: {integrity: sha512-0o/a6ghwwZf2agkbi5tIjDXkTeMcoiUbRE1aM4YmhwMngGpYoO0QRvLVnE7DTzCRmnWzF3GTRKO0PHVJkfCapQ==}
     dependencies:
       scule: 1.0.0
     dev: false
@@ -4161,6 +4229,10 @@ packages:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: true
 
+  /log-if-env@0.1.0:
+    resolution: {integrity: sha512-STaJh4qIWPp2QpvKTSw+2uofV8ExuFNGgZHj1xZu6fUgTaXqk/9x3adJ9XhP969OFCtsf7hUSHsvpDIhIsc3EA==}
+    dev: false
+
   /log-update@5.0.1:
     resolution: {integrity: sha512-5UtUDQ/6edw4ofyljDNcOVJQ4c7OjDro4h3y8e1GQL5iYElYclVHJ3zeWchylvMaKnDbDilC8irOVyexnA/Slw==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -4253,6 +4325,14 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
     dev: true
+
+  /micro-math@0.10.0:
+    resolution: {integrity: sha512-RNDWPdqKoBIyHrQz0SXfpy8P0ubuB3b84Pg270Ke8MGrsPLDc8IlelUnGxYDqZ/e3noXbrUTBfgZmLbWOozqjQ==}
+    dev: false
+
+  /micro-math@0.9.0:
+    resolution: {integrity: sha512-koKcY47NWl4IVtYAyDJFmlFvej+s3Yfq5TMjtYRNNoxYN7c30AdxpT4AMdWrvPKLi33u938mjBG2zlK5OCvj5A==}
+    dev: false
 
   /micromatch@4.0.5:
     resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==}

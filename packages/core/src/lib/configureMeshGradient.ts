@@ -1,6 +1,7 @@
-import type { MeshGradientConfig, MeshGradientOptions } from './types'
-import { resolveOptions, createGeometry } from './lib'
-import { compileShaders } from './lib/shaders/compileShaders'
+import type { MeshGradientConfig, MeshGradientOptions } from '../types/mesh'
+import { compileShaders } from './compileShaders'
+import { resolveOptions } from './resolveOptions'
+import { createGeometry } from './createGeometry'
 
 export const configureMeshGradient = (options: MeshGradientOptions): MeshGradientConfig => {
   const result = resolveOptions(options)
@@ -22,17 +23,19 @@ export const configureMeshGradient = (options: MeshGradientOptions): MeshGradien
     behaviorUniforms,
   } = compileShaders(geometry, resolvedOptions.behaviors)
 
-  const out = {
+  return {
     triangles: geometry.triangles,
     attributes: {
       ...behaviorAttributes,
       [builtinAttributeNames.controlPointStartIndex]: {
         size: 1,
         data: geometry.pointControlPointStartIndices,
+        usage: 'STATIC_DRAW',
       },
       [builtinAttributeNames.t]: {
         size: 2,
         data: geometry.pointTValues,
+        usage: 'STATIC_DRAW',
       },
     },
     uniforms: {
@@ -44,9 +47,5 @@ export const configureMeshGradient = (options: MeshGradientOptions): MeshGradien
     },
     vertexShader,
     fragmentShader,
-  } satisfies MeshGradientConfig
-
-  console.log(out)
-
-  return out
+  }
 }
