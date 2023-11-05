@@ -49,6 +49,7 @@ export const resolveOptions = (
       options: {
         subdivisions,
         points,
+        behaviors: options.behaviors ?? [],
       },
     }
   }

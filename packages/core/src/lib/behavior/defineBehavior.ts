@@ -1,12 +1,3 @@
-import type {
-  MeshGradientBehavior,
-  MeshGradientAttributes,
-  MeshGradientUniforms,
-} from '../../types'
+import type { BehaviorSetup } from '../../types'
 
-export const defineBehavior = <
-  Uniforms extends MeshGradientUniforms,
-  Attributes extends MeshGradientAttributes
->(
-  behavior: MeshGradientBehavior<Uniforms, Attributes>
-): MeshGradientBehavior<Uniforms, Attributes> => behavior
+export const defineBehavior = (behavior: BehaviorSetup) => behavior

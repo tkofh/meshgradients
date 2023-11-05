@@ -1,5 +1,6 @@
-import type { DataNode, StorageType } from '@webgl-tools/glsl-nodes'
+import type { ArrayNode, DataNode, StorageType } from '@webgl-tools/glsl-nodes'
 import type { Vector2 } from './common'
+import type { BehaviorSetup } from './behavior'
 
 export interface MeshGradientShaderCreateInputs {
   position: DataNode<'vec2', 'attribute'>
@@ -17,11 +18,13 @@ export type MeshGradientShaderCreator = (
 export interface MeshGradientOptions {
   subdivisions: number | Vector2
   points: number | Vector2
+  behaviors?: BehaviorSetup[]
 }
 
 export interface ResolvedMeshGradientOptions {
   subdivisions: Vector2
   points: Vector2
+  behaviors: BehaviorSetup[]
 }
 
 export interface MeshGradientGeometry {
@@ -64,4 +67,12 @@ export interface MeshGradientConfig {
   fragmentShader: string
   uniforms: MeshGradientUniforms
   attributes: MeshGradientAttributes
+}
+
+export interface MeshGradientGlobalAttributes {
+  controlPointStartIndex: DataNode<'float', 'attribute'>
+  t: DataNode<'vec2', 'attribute'>
+}
+export interface MeshGradientGlobalUniforms {
+  controlPointPositions: ArrayNode<'vec2', 'uniform'>
 }

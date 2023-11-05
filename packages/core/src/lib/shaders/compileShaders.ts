@@ -16,27 +16,26 @@ import {
   add,
   output,
 } from '@webgl-tools/glsl-nodes'
+import mitt from 'mitt'
 import type {
-  // BehaviorSetupContext,
-  // MeshGradientAttributes,
-  // MeshGradientBehavior,
+  BehaviorSetup,
+  BehaviorSetupContext,
+  BehaviorSetupEmitter,
+  MeshGradientAttributes,
   MeshGradientGeometry,
-  // MeshGradientUniforms,
+  MeshGradientUniforms,
 } from '../../types'
 import { IDENTITY_MATRIX } from './constants'
 
-export const compileShaders = (
-  geometry: MeshGradientGeometry
-  // behaviors: Array<MeshGradientBehavior<MeshGradientUniforms, MeshGradientAttributes>>
-) => {
+export const compileShaders = (geometry: MeshGradientGeometry, behaviors: BehaviorSetup[]) => {
   const namer = createNamer()
 
-  const UNIFORM_NAMES = {
-    CONTROL_POINT_POSITIONS: namer.uniform('controlPointPositions'),
+  const builtinUniformNames = {
+    controlPointPositions: namer.uniform('controlPointPositions'),
   } as const
-  const ATTRIBUTE_NAMES = {
-    CONTROL_POINT_START_INDEX: namer.attribute('controlPointStartIndex'),
-    T: namer.attribute('t'),
+  const builtinAttributeNames = {
+    controlPointStartIndex: namer.attribute('controlPointStartIndex'),
+    t: namer.attribute('t'),
   } as const
   const CONSTANT_NAMES = {
     IDENTITY_MATRIX: namer.constant('IDENTITY_MATRIX'),
@@ -44,12 +43,12 @@ export const compileShaders = (
 
   const controlPointPositions = uniformArray(
     'vec2',
-    UNIFORM_NAMES.CONTROL_POINT_POSITIONS,
+    builtinUniformNames.controlPointPositions,
     geometry.controlPointCount.x * geometry.controlPointCount.y
   )
 
-  const controlPointStartIndex = attribute('float', ATTRIBUTE_NAMES.CONTROL_POINT_START_INDEX)
-  const t = attribute('vec2', ATTRIBUTE_NAMES.T)
+  const controlPointStartIndex = attribute('float', builtinAttributeNames.controlPointStartIndex)
+  const t = attribute('vec2', builtinAttributeNames.t)
 
   const identityMatrix = constant(
     'mat4',
@@ -195,31 +194,50 @@ export const compileShaders = (
   const interPX = axisIntermediatePositionVector('x', bernX)
   const interPY = axisIntermediatePositionVector('y', bernX)
 
-  const position = literal('vec3', [dot(bernY, interPX), dot(bernY, interPY), '0.0'])
-  const color = literal('vec4', ['1.0', '1.0', '1.0', '1.0'])
+  const emitter = mitt() as BehaviorSetupEmitter
 
-  // const context: BehaviorSetupContext<MeshGradientUniforms, MeshGradientAttributes> = {
-  //   attributes: {},
-  //   color,
-  //   namer,
-  //   position,
-  //   uniforms: {},
-  // }
+  let behaviorAttributes: MeshGradientAttributes = {}
+  let behaviorUniforms: MeshGradientUniforms = {}
 
-  // for (const behavior of behaviors) {
-  //   console.log(behavior)
-  //   const result = behavior.setup(context)
-  // }
+  let context: BehaviorSetupContext = {
+    off: emitter.off,
+    on: emitter.on,
+    namer,
+    color: literal('vec4', ['1.0', '1.0', '1.0', '1.0']),
+    position: literal('vec3', [dot(bernY, interPX), dot(bernY, interPY), '0.0']),
+    geometry,
+    globalAttributes: {
+      controlPointStartIndex,
+      t,
+    },
+    globalUniforms: {
+      controlPointPositions,
+    },
+  }
+
+  for (const behavior of behaviors) {
+    const result = behavior(context)
+
+    context = {
+      ...context,
+      color: result.color,
+      position: result.position,
+    }
+    behaviorAttributes = { ...behaviorAttributes, ...result.attributes }
+    behaviorUniforms = { ...behaviorUniforms, ...result.uniforms }
+  }
 
   const { vertexShader, fragmentShader } = createProgram({
-    gl_FragColor: output('gl_FragColor', color),
-    gl_Position: output('gl_Position', literal('vec4', [swizzle(position, 'xyz'), '1.0'])),
+    gl_FragColor: output('gl_FragColor', context.color),
+    gl_Position: output('gl_Position', literal('vec4', [context.position, '1.0'])),
   })
 
   return {
     vertexShader,
     fragmentShader,
-    UNIFORM_NAMES,
-    ATTRIBUTE_NAMES,
+    builtinAttributeNames,
+    builtinUniformNames,
+    behaviorAttributes,
+    behaviorUniforms,
   }
 }

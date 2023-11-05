@@ -1,1 +1,1 @@
-export { solidColor } from './solidColor'
+export { randomColors } from './randomColors'

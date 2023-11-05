@@ -1,1 +1,1 @@
-export { defineColorBehavior, solidColor } from './color'
+export { randomColors } from './color'

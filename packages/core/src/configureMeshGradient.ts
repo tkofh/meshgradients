@@ -13,25 +13,31 @@ export const configureMeshGradient = (options: MeshGradientOptions): MeshGradien
 
   const geometry = createGeometry(resolvedOptions.points, resolvedOptions.subdivisions)
 
-  const { vertexShader, fragmentShader, UNIFORM_NAMES, ATTRIBUTE_NAMES } = compileShaders(
-    geometry,
-    []
-  )
+  const {
+    vertexShader,
+    fragmentShader,
+    builtinUniformNames,
+    builtinAttributeNames,
+    behaviorAttributes,
+    behaviorUniforms,
+  } = compileShaders(geometry, resolvedOptions.behaviors)
 
   const out = {
     triangles: geometry.triangles,
     attributes: {
-      [ATTRIBUTE_NAMES.CONTROL_POINT_START_INDEX]: {
+      ...behaviorAttributes,
+      [builtinAttributeNames.controlPointStartIndex]: {
         size: 1,
         data: geometry.pointControlPointStartIndices,
       },
-      [ATTRIBUTE_NAMES.T]: {
+      [builtinAttributeNames.t]: {
         size: 2,
         data: geometry.pointTValues,
       },
     },
     uniforms: {
-      [UNIFORM_NAMES.CONTROL_POINT_POSITIONS]: {
+      ...behaviorUniforms,
+      [builtinUniformNames.controlPointPositions]: {
         type: 'vec2',
         data: geometry.controlPointPositions,
       },
