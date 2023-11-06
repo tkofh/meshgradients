@@ -1,5 +1,5 @@
-import type { DataNode, Namer, StorageType } from '@webgl-tools/glsl-nodes'
 import type { Emitter } from 'mitt'
+import type { DataNode, Namer, StorageType } from '@webgl-tools/glsl-nodes'
 import type {
   MeshGradientAttributes,
   MeshGradientGlobalAttributes,
@@ -7,6 +7,7 @@ import type {
   MeshGradientUniforms,
   MeshGradientGeometry,
   MeshGradientGlobalVaryings,
+  MeshGradientGlobalVariables,
 } from './mesh'
 
 export type BehaviorSetupEmitter = Emitter<{ render: never }>
@@ -46,6 +47,7 @@ export interface BehaviorSetupContext extends Omit<BehaviorSetupEmitter, 'emit' 
   readonly globalAttributes: Readonly<MeshGradientGlobalAttributes>
   readonly globalUniforms: Readonly<MeshGradientGlobalUniforms>
   readonly globalVaryings: Readonly<MeshGradientGlobalVaryings>
+  readonly globalVariables: Readonly<MeshGradientGlobalVariables>
   readonly geometry: Readonly<MeshGradientGeometry>
 }
 

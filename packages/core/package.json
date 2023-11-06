@@ -47,9 +47,10 @@
   },
   "gitHead": "96019bee6135f93006c3fd52d23846afd6271c66",
   "dependencies": {
-    "@webgl-tools/glsl-nodes": "^0.9.1",
+    "@webgl-tools/glsl-nodes": "^0.10.1",
     "defu": "^6.1.3",
     "gl-matrix": "^3.4.3",
-    "mitt": "^3.0.1"
+    "mitt": "^3.0.1",
+    "scule": "^1.0.0"
   }
 }

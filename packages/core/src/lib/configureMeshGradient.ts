@@ -43,13 +43,19 @@ export const configureMeshGradient = (options: MeshGradientOptions): MeshGradien
         usage: 'STATIC_DRAW',
       },
     },
+    globalAttributeNames: builtinAttributeNames,
     uniforms: {
       ...behaviorUniforms,
       [builtinUniformNames.controlPointInitialPositions]: {
         type: 'vec2',
         data: geometry.controlPointPositions,
       },
+      [builtinUniformNames.time]: {
+        type: 'float',
+        data: new Float32Array([0]),
+      },
     },
+    globalUniformNames: builtinUniformNames,
     vertexShader,
     fragmentShader,
   }

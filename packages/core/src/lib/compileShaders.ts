@@ -1,3 +1,4 @@
+import mitt from 'mitt'
 import type { DataNode } from '@webgl-tools/glsl-nodes'
 import {
   access,
@@ -19,7 +20,6 @@ import {
   varying,
   uniform,
 } from '@webgl-tools/glsl-nodes'
-import mitt from 'mitt'
 import type { BehaviorSetup, BehaviorSetupEmitter } from '../types/behavior'
 import type { MeshGradientGeometry } from '../types/mesh'
 import { computeBehavior } from './computeBehavior'
@@ -55,28 +55,24 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
   const controlPointStartIndex = attribute('float', builtinAttributeNames.controlPointStartIndex)
   const t = attribute('vec2', builtinAttributeNames.t)
 
-  const identityMatrix = constant(
-    'mat4',
-    builtinConstNames.identityMatrix,
-    literal('mat4', [
-      '0.0',
-      '-0.5',
-      '1.0',
-      '-0.5',
-      '1.0',
-      '0.0',
-      '-2.5',
-      '1.5',
-      '0.0',
-      '0.5',
-      '2.0',
-      '-1.5',
-      '0.0',
-      '0.0',
-      '-0.5',
-      '0.5',
-    ])
-  )
+  const identityMatrix = constant('mat4', builtinConstNames.identityMatrix, [
+    '0.0',
+    '-0.5',
+    '1.0',
+    '-0.5',
+    '1.0',
+    '0.0',
+    '-2.5',
+    '1.5',
+    '0.0',
+    '0.5',
+    '2.0',
+    '-1.5',
+    '0.0',
+    '0.0',
+    '-0.5',
+    '0.5',
+  ])
   const cpStart = variable('int', namer.variable('cpStart'), cast(controlPointStartIndex, 'int'))
 
   const axisBernsteinVector = (
@@ -218,14 +214,30 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
       globalVaryings: {
         uv: vUv,
       },
+      globalVariables: {
+        controlPointStartIndex: cpStart,
+      },
     },
     behaviors
   )
 
-  const controlPointPositions = modifiers.controlPointPositions.reduce(
+  const controlPointPositionExpressions = modifiers.controlPointPositions.reduce(
     (controlPointPositions, modifier) => modifier(controlPointPositions),
     { x: axisControlPointPositions('x'), y: axisControlPointPositions('y') }
   )
+
+  const controlPointPositions = {
+    x: variable(
+      'mat4',
+      namer.variable('control_point_positions_x'),
+      controlPointPositionExpressions.x
+    ),
+    y: variable(
+      'mat4',
+      namer.variable('control_point_positions_y'),
+      controlPointPositionExpressions.y
+    ),
+  }
 
   const axisIntermediatePositionVector = (
     axis: 'x' | 'y',
@@ -242,15 +254,23 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
   const interPX = axisIntermediatePositionVector('x', controlPointPositions.x, bernX)
   const interPY = axisIntermediatePositionVector('y', controlPointPositions.y, bernX)
 
-  const position = modifiers.position.reduce(
-    (position, modifier) => modifier(position),
-    literal('vec3', [dot(bernY, interPX), dot(bernY, interPY), '0.0'])
+  const position = variable(
+    'vec3',
+    namer.variable('position'),
+    modifiers.position.reduce(
+      (position, modifier) => modifier(position),
+      literal('vec3', [dot(bernY, interPX), dot(bernY, interPY), '0.0'])
+    )
   )
-  const color = modifiers.color.reduce(
-    (color, modifier) => modifier(color),
-    literal('vec4', ['1.0'])
+  const color = variable(
+    'vec4',
+    namer.variable('color'),
+    modifiers.color.reduce((color, modifier) => modifier(color), literal('vec4', ['1.0']))
   )
 
+  // console.log(color, position)
+
+  // throw new Error('lol')
   const { vertexShader, fragmentShader } = createProgram({
     gl_FragColor: output('gl_FragColor', color),
     gl_Position: output('gl_Position', literal('vec4', [position, '1.0'])),

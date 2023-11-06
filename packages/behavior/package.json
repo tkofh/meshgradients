@@ -46,7 +46,7 @@
   "dependencies": {
     "@chromatika/core": "^0.2.0",
     "@meshgradients/core": "workspace:^",
-    "@webgl-tools/glsl-nodes": "^0.9.1",
+    "@webgl-tools/glsl-nodes": "^0.10.1",
     "micro-math": "^0.10.0"
   }
 }

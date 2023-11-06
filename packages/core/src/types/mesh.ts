@@ -63,14 +63,6 @@ export interface MeshGradientUniforms {
   [TUniform: string]: MeshGradientUniform
 }
 
-export interface MeshGradientConfig {
-  triangles: Uint16Array
-  vertexShader: string
-  fragmentShader: string
-  uniforms: MeshGradientUniforms
-  attributes: MeshGradientAttributes
-}
-
 export interface MeshGradientGlobalAttributes {
   controlPointStartIndex: DataNode<'float', 'attribute'>
   t: DataNode<'vec2', 'attribute'>
@@ -82,4 +74,17 @@ export interface MeshGradientGlobalUniforms {
 }
 export interface MeshGradientGlobalVaryings {
   uv: DataNode<'vec2', 'varying'>
+}
+export interface MeshGradientGlobalVariables {
+  controlPointStartIndex: DataNode<'int', 'attribute' | 'local' | 'literal'>
+}
+
+export interface MeshGradientConfig {
+  triangles: Uint16Array
+  vertexShader: string
+  fragmentShader: string
+  uniforms: MeshGradientUniforms
+  globalUniformNames: Record<keyof MeshGradientGlobalUniforms, string>
+  attributes: MeshGradientAttributes
+  globalAttributeNames: Record<keyof MeshGradientGlobalAttributes, string>
 }

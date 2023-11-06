@@ -22,13 +22,23 @@ export const createMeshGradient = (
     observeResize: true,
   })
 
+  console.log(configuration.vertexShader.replace(/\n/g, '\n\n'))
+  console.log('')
+  console.log(configuration.fragmentShader.replace(/\n/g, '\n\n'))
+
   if (stage instanceof Error) {
     throw new TypeError(`Failed to create Mesh Gradient: ${stage.message}`)
   }
 
-  console.log(stage.vertexShader)
-  console.log('')
-  console.log(stage.fragmentShader)
-
   stage.render()
+
+  return {
+    render: (time: number) => {
+      const data = stage.uniforms[configuration.globalUniformNames.time].data
+      data[0] = time * 0.001
+      stage.setUniform(configuration.globalUniformNames.time, data)
+
+      stage.render()
+    },
+  }
 }

@@ -1,4 +1,6 @@
-import type { DataNode } from '@webgl-tools/glsl-nodes'
+import { defineBehavior } from '@meshgradients/core'
+import { convertHSLToRGB } from '@chromatika/core'
+import { lerp, normalize } from 'micro-math'
 import {
   attribute,
   literal,
@@ -8,9 +10,7 @@ import {
   swizzle,
   subtract,
 } from '@webgl-tools/glsl-nodes'
-import { defineBehavior } from '@meshgradients/core'
-import { convertHSLToRGB } from '@chromatika/core'
-import { lerp, normalize } from 'micro-math'
+import type { DataNode } from '@webgl-tools/glsl-nodes'
 
 type DimensionRange = number | { min?: number; max?: number }
 
