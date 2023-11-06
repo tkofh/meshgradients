@@ -77,7 +77,7 @@ export interface MeshGradientGlobalAttributes {
   uv: DataNode<'vec2', 'attribute'>
 }
 export interface MeshGradientGlobalUniforms {
-  controlPointPositions: ArrayNode<'vec2', 'uniform'>
+  controlPointInitialPositions: ArrayNode<'vec2', 'uniform'>
   time: DataNode<'float', 'uniform'>
 }
 export interface MeshGradientGlobalVaryings {

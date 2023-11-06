@@ -1,4 +1,4 @@
-import { randomColors, uvFill } from '@meshgradients/behavior'
+import { uvFill } from '@meshgradients/behavior'
 import { createMeshGradient } from '../src'
 
 window.addEventListener(
@@ -14,12 +14,6 @@ window.addEventListener(
           uvFill({
             constant: 0.5,
             format: 'ur/vb',
-          }),
-          randomColors({
-            hue: { min: 0, max: 360 },
-            saturation: { min: 70, max: 100 },
-            lightness: { min: 50, max: 80 },
-            alpha: { min: 0, max: 0.05 },
           }),
         ],
       },

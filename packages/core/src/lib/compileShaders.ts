@@ -1,5 +1,6 @@
 import type { DataNode } from '@webgl-tools/glsl-nodes'
 import {
+  access,
   createProgram,
   createNamer,
   uniformArray,
@@ -19,35 +20,35 @@ import {
   uniform,
 } from '@webgl-tools/glsl-nodes'
 import mitt from 'mitt'
-import type { BehaviorSetup, BehaviorSetupContext, BehaviorSetupEmitter } from '../types/behavior'
-import type {
-  MeshGradientAttributes,
-  MeshGradientGeometry,
-  MeshGradientUniforms,
-} from '../types/mesh'
+import type { BehaviorSetup, BehaviorSetupEmitter } from '../types/behavior'
+import type { MeshGradientGeometry } from '../types/mesh'
+import { computeBehavior } from './computeBehavior'
 
 export const compileShaders = (geometry: MeshGradientGeometry, behaviors: BehaviorSetup[]) => {
   const namer = createNamer()
 
   const builtinUniformNames = {
-    controlPointPositions: namer.uniform('controlPointPositions'),
+    controlPointInitialPositions: namer.uniform('controlPointInitialPositions'),
     time: namer.uniform('time'),
   } as const
+
   const builtinAttributeNames = {
     controlPointStartIndex: namer.attribute('controlPointStartIndex'),
     t: namer.attribute('t'),
     uv: namer.attribute('uv'),
   } as const
+
   const builtinVaryingNames = {
     uv: namer.varying('uv'),
   } as const
+
   const builtinConstNames = {
     identityMatrix: namer.constant('IDENTITY_MATRIX'),
   } as const
 
-  const controlPointPositions = uniformArray(
+  const controlPointInitialPositions = uniformArray(
     'vec2',
-    builtinUniformNames.controlPointPositions,
+    builtinUniformNames.controlPointInitialPositions,
     geometry.controlPointCount.x * geometry.controlPointCount.y
   )
 
@@ -100,120 +101,97 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
   const bernX = axisBernsteinVector('x', t, identityMatrix)
   const bernY = axisBernsteinVector('y', t, identityMatrix)
 
-  const axisIntermediatePositionVector = (axis: 'x' | 'y', bernstein: DataNode<'vec4'>) =>
-    variable('vec4', namer.variable(`inter_p_${axis}`), [
-      dot(
-        bernstein,
-        literal('vec4', [
-          swizzle(accessArray(controlPointPositions, cpStart), axis),
-          swizzle(accessArray(controlPointPositions, add(cpStart, literal('int', ['1']))), axis),
-          swizzle(accessArray(controlPointPositions, add(cpStart, literal('int', ['2']))), axis),
-          swizzle(accessArray(controlPointPositions, add(cpStart, literal('int', ['3']))), axis),
-        ])
+  const axisControlPointPositions = (axis: 'x' | 'y') =>
+    variable('mat4', namer.variable(`control_point_positions_${axis}`), [
+      swizzle(accessArray(controlPointInitialPositions, cpStart), axis),
+      swizzle(accessArray(controlPointInitialPositions, add(cpStart, literal('int', ['1']))), axis),
+      swizzle(accessArray(controlPointInitialPositions, add(cpStart, literal('int', ['2']))), axis),
+      swizzle(accessArray(controlPointInitialPositions, add(cpStart, literal('int', ['3']))), axis),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x}`]))
+        ),
+        axis
       ),
-      dot(
-        bernstein,
-        literal('vec4', [
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x + 1}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x + 2}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x + 3}`]))
-            ),
-            axis
-          ),
-        ])
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x + 1}`]))
+        ),
+        axis
       ),
-      dot(
-        bernstein,
-        literal('vec4', [
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2 + 1}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2 + 2}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2 + 3}`]))
-            ),
-            axis
-          ),
-        ])
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x + 2}`]))
+        ),
+        axis
       ),
-      dot(
-        bernstein,
-        literal('vec4', [
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3 + 1}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3 + 2}`]))
-            ),
-            axis
-          ),
-          swizzle(
-            accessArray(
-              controlPointPositions,
-              add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3 + 3}`]))
-            ),
-            axis
-          ),
-        ])
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x + 3}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2 + 1}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2 + 2}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 2 + 3}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3 + 1}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3 + 2}`]))
+        ),
+        axis
+      ),
+      swizzle(
+        accessArray(
+          controlPointInitialPositions,
+          add(cpStart, literal('int', [`${geometry.controlPointCount.x * 3 + 3}`]))
+        ),
+        axis
       ),
     ])
-
-  const interPX = axisIntermediatePositionVector('x', bernX)
-  const interPY = axisIntermediatePositionVector('y', bernX)
 
   const aUv = attribute('vec2', builtinAttributeNames.uv)
   const vUv = varying('vec2', builtinVaryingNames.uv, aUv)
@@ -222,45 +200,60 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
 
   const emitter = mitt() as BehaviorSetupEmitter
 
-  let behaviorAttributes: MeshGradientAttributes = {}
-  let behaviorUniforms: MeshGradientUniforms = {}
-
-  let context: BehaviorSetupContext = {
-    off: emitter.off,
-    on: emitter.on,
-    namer,
-    color: literal('vec4', ['1.0']),
-    position: literal('vec3', [dot(bernY, interPX), dot(bernY, interPY), '0.0']),
-    geometry,
-    globalAttributes: {
-      controlPointStartIndex,
-      t,
-      uv: aUv,
+  const { behaviorAttributes, behaviorUniforms, modifiers } = computeBehavior(
+    {
+      off: emitter.off,
+      on: emitter.on,
+      namer,
+      geometry,
+      globalAttributes: {
+        controlPointStartIndex,
+        t,
+        uv: aUv,
+      },
+      globalUniforms: {
+        time,
+        controlPointInitialPositions,
+      },
+      globalVaryings: {
+        uv: vUv,
+      },
     },
-    globalUniforms: {
-      time,
-      controlPointPositions,
-    },
-    globalVaryings: {
-      uv: vUv,
-    },
-  }
+    behaviors
+  )
 
-  for (const behavior of behaviors) {
-    const result = behavior(context)
+  const controlPointPositions = modifiers.controlPointPositions.reduce(
+    (controlPointPositions, modifier) => modifier(controlPointPositions),
+    { x: axisControlPointPositions('x'), y: axisControlPointPositions('y') }
+  )
 
-    context = {
-      ...context,
-      color: result.color,
-      position: result.position,
-    }
-    behaviorAttributes = { ...behaviorAttributes, ...result.attributes }
-    behaviorUniforms = { ...behaviorUniforms, ...result.uniforms }
-  }
+  const axisIntermediatePositionVector = (
+    axis: 'x' | 'y',
+    positions: DataNode<'mat4'>,
+    bernstein: DataNode<'vec4'>
+  ) =>
+    variable('vec4', namer.variable(`inter_p_${axis}`), [
+      dot(bernstein, access(positions, '[0]')),
+      dot(bernstein, access(positions, '[1]')),
+      dot(bernstein, access(positions, '[2]')),
+      dot(bernstein, access(positions, '[3]')),
+    ])
+
+  const interPX = axisIntermediatePositionVector('x', controlPointPositions.x, bernX)
+  const interPY = axisIntermediatePositionVector('y', controlPointPositions.y, bernX)
+
+  const position = modifiers.position.reduce(
+    (position, modifier) => modifier(position),
+    literal('vec3', [dot(bernY, interPX), dot(bernY, interPY), '0.0'])
+  )
+  const color = modifiers.color.reduce(
+    (color, modifier) => modifier(color),
+    literal('vec4', ['1.0'])
+  )
 
   const { vertexShader, fragmentShader } = createProgram({
-    gl_FragColor: output('gl_FragColor', context.color),
-    gl_Position: output('gl_Position', literal('vec4', [context.position, '1.0'])),
+    gl_FragColor: output('gl_FragColor', color),
+    gl_Position: output('gl_Position', literal('vec4', [position, '1.0'])),
   })
 
   return {

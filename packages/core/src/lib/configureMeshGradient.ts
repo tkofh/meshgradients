@@ -45,7 +45,7 @@ export const configureMeshGradient = (options: MeshGradientOptions): MeshGradien
     },
     uniforms: {
       ...behaviorUniforms,
-      [builtinUniformNames.controlPointPositions]: {
+      [builtinUniformNames.controlPointInitialPositions]: {
         type: 'vec2',
         data: geometry.controlPointPositions,
       },

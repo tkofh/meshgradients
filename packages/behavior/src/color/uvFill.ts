@@ -49,12 +49,7 @@ export const uvFill = (options: Options) =>
 
     const rgb = lookup[format]
 
-    const color: DataNode<'vec4', 'literal' | 'varying'> = literal('vec4', [rgb, '1.0'])
-
     return {
-      position: context.position,
-      color,
-      attributes: {},
-      uniforms: {},
+      color: () => literal('vec4', [rgb, '1.0']),
     }
   })

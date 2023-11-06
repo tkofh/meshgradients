@@ -89,34 +89,6 @@ export const randomColors = (options: Options) =>
     const aColor = attribute(fixedAlpha ? 'vec3' : 'vec4', context.namer.attribute('color'))
     const vColor = varying(fixedAlpha ? 'vec3' : 'vec4', context.namer.varying('color'), aColor)
 
-    let color = context.color
-    if (fixedAlpha && alpha.min === 1) {
-      color = literal('vec4', [vColor as DataNode<'vec3'>, '1.0'])
-    } else {
-      let randomScalar: DataNode<'float', 'literal' | 'varying'>
-      let randomColor: DataNode<'vec3', 'literal' | 'varying'>
-      let otherScalar: DataNode<'float', 'literal' | 'varying'>
-      if (fixedAlpha) {
-        randomScalar = literal('float', [String(alpha.min)])
-        randomColor = vColor as DataNode<'vec3', 'varying'>
-        otherScalar = literal('float', [String(1 - alpha.min)])
-      } else {
-        randomScalar = swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')
-        randomColor = swizzle(vColor as DataNode<'vec4', 'varying'>, 'xyz')
-        otherScalar = subtract(
-          literal('float', ['1.0']),
-          swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')
-        )
-      }
-      color = literal('vec4', [
-        add(
-          multiply(randomColor, randomScalar),
-          multiply(swizzle(context.color, 'xyz'), otherScalar)
-        ),
-        '1.0',
-      ])
-    }
-
     return {
       attributes: {
         [aColor.expression]: {
@@ -125,8 +97,30 @@ export const randomColors = (options: Options) =>
           usage: 'STATIC_DRAW',
         },
       },
-      uniforms: {},
-      color,
-      position: context.position,
+      color: (color) => {
+        if (fixedAlpha && alpha.min === 1) {
+          return literal('vec4', [vColor as DataNode<'vec3'>, '1.0'])
+        } else {
+          let randomScalar: DataNode<'float', 'literal' | 'varying'>
+          let randomColor: DataNode<'vec3', 'literal' | 'varying'>
+          let otherScalar: DataNode<'float', 'literal' | 'varying'>
+          if (fixedAlpha) {
+            randomScalar = literal('float', [String(alpha.min)])
+            randomColor = vColor as DataNode<'vec3', 'varying'>
+            otherScalar = literal('float', [String(1 - alpha.min)])
+          } else {
+            randomScalar = swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')
+            randomColor = swizzle(vColor as DataNode<'vec4', 'varying'>, 'xyz')
+            otherScalar = subtract(
+              literal('float', ['1.0']),
+              swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')
+            )
+          }
+          return literal('vec4', [
+            add(multiply(randomColor, randomScalar), multiply(swizzle(color, 'xyz'), otherScalar)),
+            '1.0',
+          ])
+        }
+      },
     }
   })
