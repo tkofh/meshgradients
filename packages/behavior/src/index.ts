@@ -1,1 +1,1 @@
-export { randomColors } from './color'
+export { randomColors, uvFill } from './color'

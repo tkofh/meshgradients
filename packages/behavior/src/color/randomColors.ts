@@ -93,24 +93,25 @@ export const randomColors = (options: Options) =>
     if (fixedAlpha && alpha.min === 1) {
       color = literal('vec4', [vColor as DataNode<'vec3'>, '1.0'])
     } else {
-      let randomScalar: DataNode<'vec3', 'literal' | 'varying'>
+      let randomScalar: DataNode<'float', 'literal' | 'varying'>
       let randomColor: DataNode<'vec3', 'literal' | 'varying'>
-      let otherScalar: DataNode<'vec3', 'literal' | 'varying'>
+      let otherScalar: DataNode<'float', 'literal' | 'varying'>
       if (fixedAlpha) {
-        randomScalar = literal('vec3', [String(alpha.min)])
+        randomScalar = literal('float', [String(alpha.min)])
         randomColor = vColor as DataNode<'vec3', 'varying'>
-        otherScalar = literal('vec3', [String(1 - alpha.min)])
+        otherScalar = literal('float', [String(1 - alpha.min)])
       } else {
-        randomScalar = literal('vec3', [swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')])
+        randomScalar = swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')
         randomColor = swizzle(vColor as DataNode<'vec4', 'varying'>, 'xyz')
-        otherScalar = literal('vec3', [
-          subtract(literal('float', ['1.0']), swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')),
-        ])
+        otherScalar = subtract(
+          literal('float', ['1.0']),
+          swizzle(vColor as DataNode<'vec4', 'varying'>, 'w')
+        )
       }
       color = literal('vec4', [
         add(
-          multiply(randomScalar, randomColor),
-          multiply(otherScalar, swizzle(context.color, 'xyz'))
+          multiply(randomColor, randomScalar),
+          multiply(swizzle(context.color, 'xyz'), otherScalar)
         ),
         '1.0',
       ])

@@ -15,6 +15,8 @@ import {
   accessArray,
   add,
   output,
+  varying,
+  uniform,
 } from '@webgl-tools/glsl-nodes'
 import mitt from 'mitt'
 import type { BehaviorSetup, BehaviorSetupContext, BehaviorSetupEmitter } from '../types/behavior'
@@ -24,37 +26,23 @@ import type {
   MeshGradientUniforms,
 } from '../types/mesh'
 
-const IDENTITY_MATRIX = [
-  '0.0',
-  '-0.5',
-  '1.0',
-  '-0.5',
-  '1.0',
-  '0.0',
-  '-2.5',
-  '1.5',
-  '0.0',
-  '0.5',
-  '2.0',
-  '-1.5',
-  '0.0',
-  '0.0',
-  '-0.5',
-  '0.5',
-]
-
 export const compileShaders = (geometry: MeshGradientGeometry, behaviors: BehaviorSetup[]) => {
   const namer = createNamer()
 
   const builtinUniformNames = {
     controlPointPositions: namer.uniform('controlPointPositions'),
+    time: namer.uniform('time'),
   } as const
   const builtinAttributeNames = {
     controlPointStartIndex: namer.attribute('controlPointStartIndex'),
     t: namer.attribute('t'),
+    uv: namer.attribute('uv'),
   } as const
-  const CONSTANT_NAMES = {
-    IDENTITY_MATRIX: namer.constant('IDENTITY_MATRIX'),
+  const builtinVaryingNames = {
+    uv: namer.varying('uv'),
+  } as const
+  const builtinConstNames = {
+    identityMatrix: namer.constant('IDENTITY_MATRIX'),
   } as const
 
   const controlPointPositions = uniformArray(
@@ -68,8 +56,25 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
 
   const identityMatrix = constant(
     'mat4',
-    CONSTANT_NAMES.IDENTITY_MATRIX,
-    literal('mat4', IDENTITY_MATRIX)
+    builtinConstNames.identityMatrix,
+    literal('mat4', [
+      '0.0',
+      '-0.5',
+      '1.0',
+      '-0.5',
+      '1.0',
+      '0.0',
+      '-2.5',
+      '1.5',
+      '0.0',
+      '0.5',
+      '2.0',
+      '-1.5',
+      '0.0',
+      '0.0',
+      '-0.5',
+      '0.5',
+    ])
   )
   const cpStart = variable('int', namer.variable('cpStart'), cast(controlPointStartIndex, 'int'))
 
@@ -210,6 +215,11 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
   const interPX = axisIntermediatePositionVector('x', bernX)
   const interPY = axisIntermediatePositionVector('y', bernX)
 
+  const aUv = attribute('vec2', builtinAttributeNames.uv)
+  const vUv = varying('vec2', builtinVaryingNames.uv, aUv)
+
+  const time = uniform('float', builtinUniformNames.time)
+
   const emitter = mitt() as BehaviorSetupEmitter
 
   let behaviorAttributes: MeshGradientAttributes = {}
@@ -219,15 +229,20 @@ export const compileShaders = (geometry: MeshGradientGeometry, behaviors: Behavi
     off: emitter.off,
     on: emitter.on,
     namer,
-    color: literal('vec4', ['1.0', '1.0', '1.0', '1.0']),
+    color: literal('vec4', ['1.0']),
     position: literal('vec3', [dot(bernY, interPX), dot(bernY, interPY), '0.0']),
     geometry,
     globalAttributes: {
       controlPointStartIndex,
       t,
+      uv: aUv,
     },
     globalUniforms: {
+      time,
       controlPointPositions,
+    },
+    globalVaryings: {
+      uv: vUv,
     },
   }
 

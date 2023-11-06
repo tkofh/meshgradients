@@ -37,6 +37,11 @@ export const configureMeshGradient = (options: MeshGradientOptions): MeshGradien
         data: geometry.pointTValues,
         usage: 'STATIC_DRAW',
       },
+      [builtinAttributeNames.uv]: {
+        size: 2,
+        data: geometry.uvs,
+        usage: 'STATIC_DRAW',
+      },
     },
     uniforms: {
       ...behaviorUniforms,

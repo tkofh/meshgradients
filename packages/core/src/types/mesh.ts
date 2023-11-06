@@ -32,6 +32,7 @@ export interface MeshGradientGeometry {
   readonly pointCount: Readonly<Vector2>
 
   readonly controlPointPositions: Float32Array
+  readonly uvs: Float32Array
   readonly pointTValues: Float32Array
   readonly pointControlPointStartIndices: Float32Array
 
@@ -73,7 +74,12 @@ export interface MeshGradientConfig {
 export interface MeshGradientGlobalAttributes {
   controlPointStartIndex: DataNode<'float', 'attribute'>
   t: DataNode<'vec2', 'attribute'>
+  uv: DataNode<'vec2', 'attribute'>
 }
 export interface MeshGradientGlobalUniforms {
   controlPointPositions: ArrayNode<'vec2', 'uniform'>
+  time: DataNode<'float', 'uniform'>
+}
+export interface MeshGradientGlobalVaryings {
+  uv: DataNode<'vec2', 'varying'>
 }

@@ -66,8 +66,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       '@webgl-tools/glsl-nodes':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       micro-math:
         specifier: ^0.10.0
         version: 0.10.0
@@ -116,8 +116,8 @@ importers:
   packages/core:
     dependencies:
       '@webgl-tools/glsl-nodes':
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: ^0.9.1
+        version: 0.9.1
       defu:
         specifier: ^6.1.3
         version: 6.1.3
@@ -1814,14 +1814,8 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@webgl-tools/glsl-nodes@0.8.0:
-    resolution: {integrity: sha512-3YpKWwH7abnRdhgS4C41TOR/ENNi48Txb1pbOACukArSye5Z5Zkr4qgQhGnfiq/xORhkOiq2OvY/L9MRDKt6Kw==}
-    dependencies:
-      scule: 1.0.0
-    dev: false
-
-  /@webgl-tools/glsl-nodes@0.9.0:
-    resolution: {integrity: sha512-0o/a6ghwwZf2agkbi5tIjDXkTeMcoiUbRE1aM4YmhwMngGpYoO0QRvLVnE7DTzCRmnWzF3GTRKO0PHVJkfCapQ==}
+  /@webgl-tools/glsl-nodes@0.9.1:
+    resolution: {integrity: sha512-2HatPJFtfM1YyQygIO9drpWo1lX2SqsMiDtujUD62u3MacPYC7atzeGXRuYBcHknRFAsaNDVMh6GLSOQwRX2iw==}
     dependencies:
       scule: 1.0.0
     dev: false

@@ -6,8 +6,8 @@ import type {
   MeshGradientGlobalUniforms,
   MeshGradientUniforms,
   MeshGradientGeometry,
+  MeshGradientGlobalVaryings,
 } from './mesh'
-import type { Immutable } from './common'
 
 export type BehaviorSetupEmitter = Emitter<{ render: never }>
 
@@ -22,9 +22,10 @@ export interface BehaviorSetupContext extends Omit<BehaviorSetupEmitter, 'emit' 
   readonly namer: Namer
   readonly position: DataNode<'vec3'>
   readonly color: DataNode<'vec4', Exclude<StorageType, 'attribute'>>
-  readonly globalAttributes: Immutable<MeshGradientGlobalAttributes>
-  readonly globalUniforms: Immutable<MeshGradientGlobalUniforms>
-  readonly geometry: Immutable<MeshGradientGeometry>
+  readonly globalAttributes: Readonly<MeshGradientGlobalAttributes>
+  readonly globalUniforms: Readonly<MeshGradientGlobalUniforms>
+  readonly globalVaryings: Readonly<MeshGradientGlobalVaryings>
+  readonly geometry: Readonly<MeshGradientGeometry>
 }
 
 export type BehaviorSetup = (context: BehaviorSetupContext) => BehaviorSetupResult

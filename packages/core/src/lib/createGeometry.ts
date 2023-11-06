@@ -1,10 +1,12 @@
-import type { Vector2, MeshGradientGeometry } from '../types'
+import type { Vector2 } from '../types/common'
+import type { MeshGradientGeometry } from '../types/mesh'
 
 export const createGeometry = (points: Vector2, subdivisions: Vector2): MeshGradientGeometry => {
   const controlPointPositions: number[] = []
 
   const pointTValues: number[] = []
   const pointControlPointStartIndices: number[] = []
+  const uvs: number[] = []
 
   const triangles: number[] = []
 
@@ -43,6 +45,8 @@ export const createGeometry = (points: Vector2, subdivisions: Vector2): MeshGrad
 
       pointControlPointStartIndices.push(cpY * controlPointCount.x + cpX)
 
+      uvs.push(x / (pointCount.x - 1), y / (pointCount.y - 1))
+
       if (x >= 1 && y >= 1) {
         const tr = y * pointCount.x + x
         const tl = y * pointCount.x + x - 1
@@ -60,6 +64,7 @@ export const createGeometry = (points: Vector2, subdivisions: Vector2): MeshGrad
     controlPointPositions: new Float32Array(controlPointPositions),
     pointTValues: new Float32Array(pointTValues),
     pointControlPointStartIndices: new Float32Array(pointControlPointStartIndices),
+    uvs: new Float32Array(uvs),
 
     triangles: new Uint16Array(triangles),
   }
