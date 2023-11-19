@@ -14,6 +14,8 @@ export const configureMeshGradient = (options: MeshGradientOptions): MeshGradien
 
   const geometry = createGeometry(resolvedOptions.points, resolvedOptions.subdivisions)
 
+  console.log(geometry)
+
   const {
     vertexShader,
     fragmentShader,

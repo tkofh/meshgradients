@@ -5,33 +5,31 @@ import { createMeshGradient } from '../src'
 window.addEventListener(
   'load',
   () => {
-    const start = performance.now()
-    const canvas = document.querySelector<HTMLCanvasElement>('#canvas')
-    const ticker = createTicker()
-    ticker.start()
-
     const { render } = createMeshGradient(
       {
         subdivisions: 50,
-        points: 5,
+        points: { x: 5, y: 4 },
         behaviors: [
-          uvFill({
-            constant: 0.55,
-            format: 'ur/vb',
-          }),
+          uvFill({ constant: 0.5, format: 'ur/vb' }),
           randomOffset({
             axis: 'x',
+            amplitude: { min: 0.2, max: 0.5 },
+            frequency: { min: 0.2, max: 0.9 },
+          }),
+          randomOffset({
+            axis: 'y',
+            amplitude: { min: 0.1, max: 0.5 },
+            frequency: { min: 0.2, max: 1.5 },
           }),
         ],
       },
-      canvas
+      document.querySelector<HTMLCanvasElement>('#canvas'),
+      true
     )
 
-    ticker.add((time) => {
+    createTicker().add((time) => {
       render(time)
     })
-
-    console.log(performance.now() - start)
   },
   { capture: false }
 )

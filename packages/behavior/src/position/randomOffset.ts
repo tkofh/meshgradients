@@ -8,7 +8,6 @@ import {
   sin,
   uniformArray,
   variable,
-  swizzle,
   accessArray,
 } from '@webgl-tools/glsl-nodes'
 import type { DataNode } from '@webgl-tools/glsl-nodes'
@@ -55,59 +54,101 @@ export const randomOffset = (options: Options) =>
       options.amplitude?.max ?? 1 / (context.geometry.controlPointCount[options.axis] - 1)
 
     const frequencyMin = options.frequency?.min ?? 0
-    const frequencyMax = options.frequency?.max ?? 0.5
+    const frequencyMax = options.frequency?.max ?? 3
 
-    const offsetParams = uniformArray(
-      'vec3',
-      context.namer.uniform('offset_params'),
-      controlPointCount
-    )
-    const offsetData: number[] = []
-    for (let i = 0; i < controlPointCount; i++) {
-      offsetData.push(
-        Math.random() * Math.PI * 2,
-        lerp(Math.random(), amplitudeMin, amplitudeMax),
-        lerp(Math.random(), frequencyMin, frequencyMax)
-      )
+    const amplitude = uniformArray('float', context.namer.uniform('amplitude'), controlPointCount)
+    const amplitudeData: number[] = []
+
+    const frequency = uniformArray('float', context.namer.uniform('frequency'), controlPointCount)
+    const frequencyData: number[] = []
+
+    for (let y = 0; y < context.geometry.controlPointCount.y; y++) {
+      const isFrameY = y === 1 || y === context.geometry.controlPointCount.y - 2
+      const isFrameStructureY =
+        isFrameY || y === 0 || y === context.geometry.controlPointCount.y - 1
+      for (let x = 0; x < context.geometry.controlPointCount.x; x++) {
+        let fix = true
+        const isFrameX = x === 1 || x === context.geometry.controlPointCount.x - 2
+
+        const isFrameStructureX =
+          isFrameX || x === 0 || x === context.geometry.controlPointCount.x - 1
+
+        fix =
+          isFrameStructureX ||
+          isFrameStructureY ||
+          (isFrameStructureX && options.axis === 'y') ||
+          (isFrameStructureY && options.axis === 'x')
+
+        if (fix) {
+          amplitudeData.push(0)
+          frequencyData.push(0)
+        } else {
+          amplitudeData.push(
+            lerp(Math.random(), amplitudeMin, amplitudeMax) * (Math.random() > 0.5 ? 1 : -1)
+          )
+          frequencyData.push(lerp(Math.random(), frequencyMin, frequencyMax))
+        }
+      }
     }
 
-    const accessOffsetParams = (axis: 'x' | 'y' | 'z', name: string) =>
-      variable(
-        'mat4',
-        context.namer.variable(name),
-        controlPointIndices.map((index) =>
-          swizzle(
-            accessArray(
-              offsetParams,
-              add(context.globalVariables.controlPointStartIndex, literal('int', [String(index)]))
-            ),
-            axis
-          )
-        ) as ArrayWithOne<DataNode<'float', 'literal' | 'uniform'>>
-      )
+    const localAmplitude = variable(
+      'mat4',
+      context.namer.variable('amplitude'),
+      controlPointIndices.map((index) =>
+        accessArray(
+          amplitude,
+          add(context.globalVariables.controlPointStartIndex, literal('int', [String(index)]))
+        )
+      ) as ArrayWithOne<DataNode<'float', 'literal' | 'uniform'>>
+    )
+    const localFrequency = variable(
+      'mat4',
+      context.namer.variable('frequency'),
+      controlPointIndices.map((index) =>
+        accessArray(
+          frequency,
+          add(context.globalVariables.controlPointStartIndex, literal('int', [String(index)]))
+        )
+      ) as ArrayWithOne<DataNode<'float', 'literal' | 'uniform'>>
+    )
 
-    const inputs = multiply(
-      add(accessOffsetParams('x', 'offsets'), context.globalUniforms.time),
-      accessOffsetParams('z', 'frequencies')
+    const inputs = variable(
+      'mat4',
+      context.namer.variable('inputs'),
+      multiply(localFrequency, context.globalUniforms.time)
     )
-    const offsets = multiply(
+
+    const offsets = // multiply(
       literal('mat4', [
-        sin(access(inputs, '[0]')),
-        sin(access(inputs, '[1]')),
-        sin(access(inputs, '[2]')),
-        sin(access(inputs, '[3]')),
-      ]),
-      accessOffsetParams('y', 'amplitudes')
-    )
+        // sin(context.globalUniforms.time),
+        multiply(sin(access(inputs, '[0][0]')), access(localAmplitude, '[0][0]')),
+        multiply(sin(access(inputs, '[0][1]')), access(localAmplitude, '[0][1]')),
+        multiply(sin(access(inputs, '[0][2]')), access(localAmplitude, '[0][2]')),
+        multiply(sin(access(inputs, '[0][3]')), access(localAmplitude, '[0][3]')),
+        multiply(sin(access(inputs, '[1][0]')), access(localAmplitude, '[1][0]')),
+        multiply(sin(access(inputs, '[1][1]')), access(localAmplitude, '[1][1]')),
+        multiply(sin(access(inputs, '[1][2]')), access(localAmplitude, '[1][2]')),
+        multiply(sin(access(inputs, '[1][3]')), access(localAmplitude, '[1][3]')),
+        multiply(sin(access(inputs, '[2][0]')), access(localAmplitude, '[2][0]')),
+        multiply(sin(access(inputs, '[2][1]')), access(localAmplitude, '[2][1]')),
+        multiply(sin(access(inputs, '[2][2]')), access(localAmplitude, '[2][2]')),
+        multiply(sin(access(inputs, '[2][3]')), access(localAmplitude, '[2][3]')),
+        multiply(sin(access(inputs, '[3][0]')), access(localAmplitude, '[3][0]')),
+        multiply(sin(access(inputs, '[3][1]')), access(localAmplitude, '[3][1]')),
+        multiply(sin(access(inputs, '[3][2]')), access(localAmplitude, '[3][2]')),
+        multiply(sin(access(inputs, '[3][3]')), access(localAmplitude, '[3][3]')),
+      ]) //,
+    // localAmplitude
+    // )
 
     return {
       uniforms: {
-        [offsetParams.expression]: {
-          type: 'vec3',
-          data: new Float32Array(offsetData),
-        },
+        [amplitude.expression]: { type: 'float', data: new Float32Array(amplitudeData) },
+        [frequency.expression]: { type: 'float', data: new Float32Array(frequencyData) },
       },
       controlPointPositions: (controlPointPositions) => ({
+        // x: options.axis === 'x' ? add(controlPointPositions.x, offsets) : controlPointPositions.x,
+        // y: options.axis === 'y' ? add(controlPointPositions.y, offsets) : controlPointPositions.y,
         x: options.axis === 'x' ? add(controlPointPositions.x, offsets) : controlPointPositions.x,
         y: options.axis === 'y' ? add(controlPointPositions.y, offsets) : controlPointPositions.y,
       }),

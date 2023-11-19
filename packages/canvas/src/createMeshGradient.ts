@@ -4,7 +4,8 @@ import { createStage } from '@webgl-tools/stage'
 
 export const createMeshGradient = (
   options: MeshGradientOptions,
-  canvas?: HTMLCanvasElement | null
+  canvas?: HTMLCanvasElement | null,
+  debug = false
 ) => {
   const configuration = configureMeshGradient(options)
 
@@ -13,7 +14,7 @@ export const createMeshGradient = (
     attributes: configuration.attributes,
     elements: {
       data: configuration.triangles,
-      mode: 'TRIANGLES',
+      mode: debug ? 'LINES' : 'TRIANGLES',
       type: 'UNSIGNED_SHORT',
     },
     uniforms: configuration.uniforms,
@@ -21,10 +22,6 @@ export const createMeshGradient = (
     fragmentShader: configuration.fragmentShader,
     observeResize: true,
   })
-
-  console.log(configuration.vertexShader.replace(/\n/g, '\n\n'))
-  console.log('')
-  console.log(configuration.fragmentShader.replace(/\n/g, '\n\n'))
 
   if (stage instanceof Error) {
     throw new TypeError(`Failed to create Mesh Gradient: ${stage.message}`)
